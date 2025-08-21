@@ -32,6 +32,22 @@ router.get("/", async (req, res) => {
   }
 })
 
+router.get("/:id", async (req, res) => {
+  const { id } = req.params
+
+  try {
+    const carro = await prisma.carro.findFirst({
+      where: { id: Number(id)},
+      include: {
+        marca: true,
+      }
+    })
+    res.status(200).json(carro)
+  } catch (error) {
+    res.status(500).json({ erro: error })
+  }
+})
+
 router.post("/", async (req, res) => {
 
   const valida = carroSchema.safeParse(req.body)
