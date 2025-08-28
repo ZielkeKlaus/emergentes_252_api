@@ -37,6 +37,17 @@ model Carro {
   @@map("carros")
 }
 
+model Cliente {
+  id            Int      @id @default(autoincrement())
+  nome          String   @db.VarChar(60)
+  email         String   @db.VarChar(40)
+  senha         String   @db.VarChar(60)   // senha deve ser varchar(60)
+  cidade        String   @db.VarChar(30) 
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt  
+  @@map("clientes")
+}
+
 enum Combustiveis {
   FLEX
   GASOLINA
