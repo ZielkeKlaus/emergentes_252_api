@@ -110,4 +110,16 @@ router.post("/", async (req, res) => {
   }
 })
 
+router.get("/:id", async (req, res) => {
+  const { id } = req.params
+  try {
+    const cliente = await prisma.cliente.findUnique({
+      where: { id }
+    })
+    res.status(200).json(cliente)
+  } catch (error) {
+    res.status(400).json(error)
+  }
+})
+
 export default router
