@@ -34,7 +34,9 @@ model Carro {
   destaque       Boolean      @default(true)
   marca          Marca        @relation(fields: [marcaId], references: [id])
   marcaId        Int
-  propostas     Proposta[]
+  propostas      Proposta[]
+  admin          Admin?       @relation(fields: [adminId], references: [id])
+  adminId        String?      @db.VarChar(36)   
   @@map("carros")
 }
 
@@ -60,7 +62,22 @@ model Proposta {
   resposta    String?   @db.VarChar(255)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt  
+  admin       Admin?    @relation(fields: [adminId], references: [id])
+  adminId     String?    @db.VarChar(36)  
   @@map("propostas")
+}
+
+model Admin {
+  id            String   @db.VarChar(36) @id @default(uuid())
+  nome          String   @db.VarChar(60)
+  email         String   @db.VarChar(40)
+  senha         String   @db.VarChar(60)   // senha deve ser varchar(60)
+  nivel         Int      @db.SmallInt @default(2)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt  
+  carros        Carro[]
+  propostas     Proposta[]
+  @@map("admins")
 }
 
 enum Combustiveis {

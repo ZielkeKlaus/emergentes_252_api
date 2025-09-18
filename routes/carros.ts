@@ -32,6 +32,22 @@ router.get("/", async (req, res) => {
   }
 })
 
+router.get("/destaques", async (req, res) => {
+  try {
+    const carros = await prisma.carro.findMany({
+      include: {
+        marca: true,
+      },
+      where: {
+        destaque: true
+      }
+    })
+    res.status(200).json(carros)
+  } catch (error) {
+    res.status(500).json({ erro: error })
+  }
+})
+
 router.get("/:id", async (req, res) => {
   const { id } = req.params
 
