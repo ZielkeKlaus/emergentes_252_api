@@ -1,6 +1,8 @@
 import express from 'express'
 import cors from 'cors'
 
+import 'dotenv/config'
+
 import routesMarcas from './routes/marcas'
 import routesCarros from './routes/carros'
 import routesLogin from './routes/login'

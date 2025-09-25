@@ -2,6 +2,8 @@ import { Combustiveis, PrismaClient } from '@prisma/client'
 import { Router } from 'express'
 import { z } from 'zod'
 
+import { verificaToken } from '../middewares/verificaToken'
+
 const prisma = new PrismaClient()
 
 const router = Router()
@@ -177,6 +179,25 @@ router.get("/pesquisa/:termo", async (req, res) => {
         res.status(500).json({ erro: error })
       }
     }
+  }
+})
+
+router.patch("/destacar/:id", verificaToken, async (req, res) => {
+  const { id } = req.params
+
+  try {
+    const carroDestacar = await prisma.carro.findUnique({
+      where: { id: Number(id) },
+      select: { destaque: true }, 
+    });
+
+    const carro = await prisma.carro.update({
+      where: { id: Number(id) },
+      data: { destaque: !carroDestacar?.destaque }
+    })
+    res.status(200).json(carro)
+  } catch (error) {
+    res.status(400).json(error)
   }
 })
 
