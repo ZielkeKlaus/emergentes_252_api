@@ -19,6 +19,7 @@ const carroSchema = z.object({
   combustivel: z.nativeEnum(Combustiveis).optional(),
   destaque: z.boolean().optional(),
   marcaId: z.number(),
+  adminId: z.string().uuid()
 })
 
 router.get("/", async (req, res) => {
@@ -26,6 +27,9 @@ router.get("/", async (req, res) => {
     const carros = await prisma.carro.findMany({
       include: {
         marca: true,
+      },
+      orderBy: {
+        id: 'desc'
       }
     })
     res.status(200).json(carros)
@@ -42,6 +46,9 @@ router.get("/destaques", async (req, res) => {
       },
       where: {
         destaque: true
+      },
+      orderBy: {
+        id: 'desc'
       }
     })
     res.status(200).json(carros)
@@ -75,13 +82,13 @@ router.post("/", async (req, res) => {
   }
 
   const { modelo, ano, preco, km, foto, acessorios = null,
-    destaque = true, combustivel = 'FLEX', marcaId } = valida.data
+    destaque = true, combustivel = 'FLEX', marcaId, adminId } = valida.data
 
   try {
     const carro = await prisma.carro.create({
       data: {
         modelo, ano, preco, km, foto, acessorios, destaque,
-        combustivel, marcaId
+        combustivel, marcaId, adminId
       }
     })
     res.status(201).json(carro)
@@ -113,14 +120,14 @@ router.put("/:id", async (req, res) => {
   }
 
   const { modelo, ano, preco, km, foto, acessorios,
-    destaque, combustivel, marcaId } = valida.data
+    destaque, combustivel, marcaId, adminId } = valida.data
 
   try {
     const carro = await prisma.carro.update({
       where: { id: Number(id) },
       data: {
         modelo, ano, preco, km, foto, acessorios,
-        destaque, combustivel, marcaId
+        destaque, combustivel, marcaId, adminId
       }
     })
     res.status(200).json(carro)
