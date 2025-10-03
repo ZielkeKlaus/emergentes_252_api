@@ -37,6 +37,7 @@ model Carro {
   propostas      Proposta[]
   admin          Admin?       @relation(fields: [adminId], references: [id])
   adminId        String?      @db.VarChar(36)   
+  ativo          Boolean      @default(true)
   @@map("carros")
 }
 
@@ -77,7 +78,19 @@ model Admin {
   updatedAt     DateTime @updatedAt  
   carros        Carro[]
   propostas     Proposta[]
+  logs          Log[]
   @@map("admins")
+}
+
+model Log {
+  id            Int         @id @default(autoincrement())
+  admin         Admin       @relation(fields: [adminId], references: [id])
+  adminId       String      @db.VarChar(36)
+  descricao     String      @db.VarChar(60)
+  complemento   String      @db.VarChar(200)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  @@map("logs")
 }
 
 enum Combustiveis {

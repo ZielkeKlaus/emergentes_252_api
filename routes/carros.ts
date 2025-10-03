@@ -25,6 +25,9 @@ const carroSchema = z.object({
 router.get("/", async (req, res) => {
   try {
     const carros = await prisma.carro.findMany({
+      where: {
+        ativo: true,
+      },
       include: {
         marca: true,
       },
@@ -41,11 +44,12 @@ router.get("/", async (req, res) => {
 router.get("/destaques", async (req, res) => {
   try {
     const carros = await prisma.carro.findMany({
+      where: {
+        ativo: true,
+        destaque: true
+      },
       include: {
         marca: true,
-      },
-      where: {
-        destaque: true
       },
       orderBy: {
         id: 'desc'
@@ -62,7 +66,7 @@ router.get("/:id", async (req, res) => {
 
   try {
     const carro = await prisma.carro.findFirst({
-      where: { id: Number(id)},
+      where: { id: Number(id) },
       include: {
         marca: true,
       }
@@ -97,13 +101,30 @@ router.post("/", async (req, res) => {
   }
 })
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", verificaToken, async (req, res) => {
   const { id } = req.params
 
   try {
-    const carro = await prisma.carro.delete({
-      where: { id: Number(id) }
+    // const carro = await prisma.carro.delete({
+    //   where: { id: Number(id) }
+    // })
+    const carro = await prisma.carro.update({
+      where: { id: Number(id) },
+      data: { ativo: false }
     })
+
+    // adminId vem do verificaToken (que acrescenta quando o usuário faz login)
+    const adminId = req.userLogadoId as string
+    const adminNome = req.userLogadoNome as string
+
+    const descricao = `Exclusão de: ${carro.modelo}`
+    const complemento = `Admin: ${adminNome}`
+
+    // registra um log de exclusão de carro
+    const log = await prisma.log.create({
+      data: { descricao, complemento, adminId }
+    })    
+
     res.status(200).json(carro)
   } catch (error) {
     res.status(400).json({ erro: error })
@@ -150,6 +171,7 @@ router.get("/pesquisa/:termo", async (req, res) => {
           marca: true,
         },
         where: {
+          ativo: true,
           OR: [
             { modelo: { contains: termo, mode: "insensitive" } },
             { marca: { nome: { equals: termo, mode: "insensitive" } } }
@@ -167,19 +189,25 @@ router.get("/pesquisa/:termo", async (req, res) => {
           include: {
             marca: true,
           },
-          where: { ano: termoNumero }
+          where: {
+            ativo: true,
+            ano: termoNumero
+          }
         })
         res.status(200).json(carros)
       } catch (error) {
         res.status(500).json({ erro: error })
-      }  
+      }
     } else {
       try {
         const carros = await prisma.carro.findMany({
           include: {
             marca: true,
           },
-          where: { preco: { lte: termoNumero } }
+          where: {
+            ativo: true,
+            preco: { lte: termoNumero }
+          }
         })
         res.status(200).json(carros)
       } catch (error) {
@@ -195,7 +223,7 @@ router.patch("/destacar/:id", verificaToken, async (req, res) => {
   try {
     const carroDestacar = await prisma.carro.findUnique({
       where: { id: Number(id) },
-      select: { destaque: true }, 
+      select: { destaque: true },
     });
 
     const carro = await prisma.carro.update({
