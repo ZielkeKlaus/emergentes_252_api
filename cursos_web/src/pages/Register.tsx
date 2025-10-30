@@ -6,18 +6,40 @@ export default function Register() {
   const [nome, setNome] = useState('')
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
   const nav = useNavigate()
 
   async function submit(e: any) {
     e.preventDefault()
+    setError('')
+    setLoading(true)
     try {
+      // Validações básicas
+      if (nome.length < 3) {
+        throw new Error('Nome deve ter no mínimo 3 caracteres')
+      }
+      if (!email.includes('@')) {
+        throw new Error('Email inválido')
+      }
+      if (senha.length < 8) {
+        throw new Error('Senha deve ter no mínimo 8 caracteres')
+      }
+      
       await registerUser({ nome, email, senha })
       // auto login
       const r = await loginUser({ email, senha })
       setToken(r.token)
       nav('/')
     } catch (err: any) {
-      alert(err?.response?.data?.erro || 'Erro')
+      console.error('Erro no cadastro:', err)
+      setError(
+        err.message || // Nossas validações
+        err?.response?.data?.erro || // Erro do backend
+        'Erro ao criar conta. Verifique os dados e tente novamente.'
+      )
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -48,7 +70,18 @@ export default function Register() {
               </ul>
             </div>
           </div>
-          <button type="submit" className="w-full bg-success text-white py-2 rounded">Cadastrar</button>
+          <button 
+            type="submit" 
+            disabled={loading}
+            className={`w-full py-2 rounded ${loading ? 'bg-gray-400' : 'bg-success'} text-white`}
+          >
+            {loading ? 'Cadastrando...' : 'Cadastrar'}
+          </button>
+          {error && (
+            <div className="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+              {error}
+            </div>
+          )}
         </form>
       </div>
     </div>
