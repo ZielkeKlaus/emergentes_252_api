@@ -10,12 +10,16 @@ export default function Login() {
 
   async function submit(e: any) {
     e.preventDefault()
+    console.log('Tentando fazer login...')
+    console.log('API Base:', import.meta.env.VITE_API_BASE || 'http://localhost:3001')
     try {
       const res = await loginUser({ email, senha })
+      console.log('Login bem-sucedido:', res)
       // res should include token
       setToken(res.token)
       nav('/')
     } catch (err: any) {
+      console.error('Erro no login:', err)
       setErro(err?.response?.data?.erro || 'Erro no login')
     }
   }
