@@ -18,7 +18,16 @@ export default function Login() {
       // res should include token
       setToken(res.token)
       localStorage.setItem('userNome', res.nome)
-      nav('/')
+      localStorage.setItem('userId', res.id)
+      
+      // Se for admin, redireciona para o dashboard admin
+      if (res.tipo === 'admin') {
+        localStorage.setItem('adminId', res.id)
+        nav('/admin/dashboard')
+      } else {
+        // Se for cliente, vai para a home
+        nav('/')
+      }
     } catch (err: any) {
       console.error('Erro no login:', err)
       setErro(err?.response?.data?.erro || 'Erro no login')

@@ -20,6 +20,38 @@ router.post("/", async (req, res) => {
   }
 
   try {
+    // Primeiro tenta logar como admin
+    const admin = await prisma.admin.findFirst({
+      where: { email }
+    })
+
+    if (admin) {
+      // Verifica a senha do admin
+      if (bcrypt.compareSync(senha, admin.senha)) {
+        const token = jwt.sign({
+          adminLogadoId: admin.id,
+          adminLogadoNome: admin.nome,
+          tipo: 'admin'
+        },
+          process.env.JWT_KEY as string,
+          { expiresIn: "1h" }
+        )
+
+        res.status(200).json({
+          id: admin.id,
+          nome: admin.nome,
+          email: admin.email,
+          token,
+          tipo: 'admin'
+        })
+        return
+      } else {
+        res.status(400).json({ erro: mensaPadrao })
+        return
+      }
+    }
+
+    // Se não for admin, tenta logar como cliente
     const cliente = await prisma.cliente.findFirst({
       where: { email }
     })
@@ -35,7 +67,8 @@ router.post("/", async (req, res) => {
       // se confere, gera e retorna o token
       const token = jwt.sign({
         clienteLogadoId: cliente.id,
-        clienteLogadoNome: cliente.nome
+        clienteLogadoNome: cliente.nome,
+        tipo: 'cliente'
       },
         process.env.JWT_KEY as string,
         { expiresIn: "1h" }
@@ -45,7 +78,8 @@ router.post("/", async (req, res) => {
         id: cliente.id,
         nome: cliente.nome,
         email: cliente.email,
-        token
+        token,
+        tipo: 'cliente'
       })
     } else {
       res.status(400).json({ erro: mensaPadrao })
