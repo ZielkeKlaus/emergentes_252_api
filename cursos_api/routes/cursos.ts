@@ -37,8 +37,15 @@ router.get("/:id", async (req, res) => {
 })
 
 router.post("/", async (req, res) => {
+  console.log('POST /cursos body:', req.body)
   const valida = cursoSchema.safeParse(req.body)
-  if (!valida.success) return res.status(400).json({ erro: valida.error })
+  if (!valida.success) {
+    console.error('Validação falhou:', valida.error.issues)
+    return res.status(400).json({ 
+      erro: 'Dados inválidos', 
+      detalhes: valida.error.issues.map(i => `${i.path.join('.')}: ${i.message}`)
+    })
+  }
 
   try {
     const curso = await prisma.curso.create({ data: valida.data })
@@ -51,8 +58,15 @@ router.post("/", async (req, res) => {
 
 router.put("/:id", async (req, res) => {
   const { id } = req.params
+  console.log(`PUT /cursos/${id} body:`, req.body)
   const valida = cursoSchema.safeParse(req.body)
-  if (!valida.success) return res.status(400).json({ erro: valida.error })
+  if (!valida.success) {
+    console.error('Validação falhou:', valida.error.issues)
+    return res.status(400).json({ 
+      erro: 'Dados inválidos', 
+      detalhes: valida.error.issues.map(i => `${i.path.join('.')}: ${i.message}`)
+    })
+  }
 
   try {
     const curso = await prisma.curso.update({ where: { id: Number(id) }, data: valida.data })
