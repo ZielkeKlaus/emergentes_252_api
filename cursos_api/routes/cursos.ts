@@ -9,6 +9,7 @@ const cursoSchema = z.object({
   titulo: z.string().min(3),
   descricao: z.string().min(10),
   cargaHoraria: z.number().int(),
+  preco: z.number().optional(),
   categoriaId: z.number().int(),
   instrutorId: z.string().uuid(),
   imagem: z.string().url().optional()
