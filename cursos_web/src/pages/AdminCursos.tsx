@@ -208,7 +208,9 @@ export default function AdminCursos() {
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{curso.id}</td>
                 <td className="px-6 py-4 text-sm text-gray-900">{curso.titulo}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{curso.cargaHoraria}h</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">R$ {curso.preco.toFixed(2)}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  R$ {curso.preco ? curso.preco.toFixed(2) : '0.00'}
+                </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{curso.categoria.nome}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{curso.instrutor.nome}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
