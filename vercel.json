@@ -1,15 +1,11 @@
 {
-  "version": 2,
-  "builds": [  
+  "buildCommand": "cd cursos_web && npm install && npm run build",
+  "outputDirectory": "cursos_web/dist",
+  "framework": "vite",
+  "rewrites": [
     {
-      "src": "index.ts",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "(.*)",
-      "dest": "index.ts"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
