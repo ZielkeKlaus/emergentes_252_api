@@ -13,6 +13,7 @@ import routesAdmins from './routes/admins'
 import routesAdminLogin from './routes/adminLogin'
 import routesDashboard from './routes/dashboard'
 import routesReset from './routes/reset'
+import routesSetup from './routes/setup'
 
 const app = express()
 const port = process.env.PORT || 3001
@@ -36,6 +37,7 @@ app.use('/admins/login', routesAdminLogin)
 app.use('/admins', routesAdmins)
 app.use('/dashboard', routesDashboard)
 app.use('/reset', routesReset)
+app.use('/setup', routesSetup)
 
 app.get('/', (req, res) => res.send('API: Cursos Academy'))
 

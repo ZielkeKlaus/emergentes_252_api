@@ -16,6 +16,8 @@ const avaliacoes_1 = __importDefault(require("./routes/avaliacoes"));
 const admins_1 = __importDefault(require("./routes/admins"));
 const adminLogin_1 = __importDefault(require("./routes/adminLogin"));
 const dashboard_1 = __importDefault(require("./routes/dashboard"));
+const reset_1 = __importDefault(require("./routes/reset"));
+const setup_1 = __importDefault(require("./routes/setup"));
 const app = (0, express_1.default)();
 const port = process.env.PORT || 3001;
 const prisma = new client_1.PrismaClient();
@@ -34,6 +36,8 @@ app.use('/avaliacoes', avaliacoes_1.default);
 app.use('/admins/login', adminLogin_1.default);
 app.use('/admins', admins_1.default);
 app.use('/dashboard', dashboard_1.default);
+app.use('/reset', reset_1.default);
+app.use('/setup', setup_1.default);
 app.get('/', (req, res) => res.send('API: Cursos Academy'));
 // Health endpoint to check DB connectivity
 app.get('/health/db', async (req, res) => {

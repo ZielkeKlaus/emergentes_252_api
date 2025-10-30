@@ -51,20 +51,31 @@ router.get("/", async (req, res) => {
     }
 });
 router.post("/", async (req, res) => {
+    console.log('POST /usuarios - Body recebido:', req.body);
     const valida = usuarioSchema.safeParse(req.body);
-    if (!valida.success)
-        return res.status(400).json({ erro: valida.error });
+    if (!valida.success) {
+        console.log('Erro de validação:', valida.error);
+        return res.status(400).json({ erro: valida.error.issues });
+    }
     const erros = validaSenha(valida.data.senha);
-    if (erros.length > 0)
+    if (erros.length > 0) {
+        console.log('Erro na senha:', erros);
         return res.status(400).json({ erro: erros.join('; ') });
+    }
     const salt = bcrypt_1.default.genSaltSync(12);
     const hash = bcrypt_1.default.hashSync(valida.data.senha, salt);
     try {
         const usuario = await prisma.usuario.create({ data: { nome: valida.data.nome, email: valida.data.email, senha: hash, tipo: valida.data.tipo || 'aluno', cidade: valida.data.cidade || null } });
+        console.log('Usuário criado com sucesso:', usuario.id);
         res.status(201).json(usuario);
     }
     catch (error) {
-        res.status(400).json(error);
+        console.error('Erro ao criar usuário no banco:', error);
+        // Verifica se é erro de email duplicado
+        if (error.code === 'P2002' && error.meta?.target?.includes('email')) {
+            return res.status(400).json({ erro: 'Este e-mail já está em uso' });
+        }
+        res.status(400).json({ erro: 'Erro ao criar usuário' });
     }
 });
 router.get("/:id", async (req, res) => {
@@ -75,6 +86,19 @@ router.get("/:id", async (req, res) => {
     }
     catch (error) {
         res.status(400).json(error);
+    }
+});
+router.delete("/:id", async (req, res) => {
+    const { id } = req.params;
+    console.log('DELETE /usuarios/:id - Deletando usuário:', id);
+    try {
+        const usuario = await prisma.usuario.delete({ where: { id } });
+        console.log('Usuário deletado com sucesso:', usuario.email);
+        res.status(200).json({ mensagem: 'Usuário deletado com sucesso', usuario });
+    }
+    catch (error) {
+        console.error('Erro ao deletar usuário:', error);
+        res.status(400).json({ erro: 'Erro ao deletar usuário' });
     }
 });
 exports.default = router;
