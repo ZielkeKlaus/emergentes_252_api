@@ -9,12 +9,43 @@ export default function CourseDetails(){
   const [nota, setNota] = useState(5)
   const [comentario, setComentario] = useState('')
   const [mensagem, setMensagem] = useState('')
+  const [jaMatriculado, setJaMatriculado] = useState(false)
+  const [verificandoMatricula, setVerificandoMatricula] = useState(true)
 
   useEffect(() => {
     if (!id) return
     api.get(`/cursos/${id}`).then(r => setCurso(r.data)).catch(console.error)
     carregarAvaliacoes()
+    verificarMatricula()
   }, [id])
+
+  async function verificarMatricula() {
+    const token = localStorage.getItem('token')
+    const usuarioId = localStorage.getItem('userId')
+    
+    if (!token || !usuarioId || !id) {
+      setVerificandoMatricula(false)
+      return
+    }
+
+    try {
+      // Buscar todas as matrículas do usuário
+      const response = await api.get('/matriculas', {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      
+      // Verificar se já está matriculado neste curso
+      const matriculaExiste = response.data.some((m: any) => 
+        m.alunoId === usuarioId && m.cursoId === Number(id)
+      )
+      
+      setJaMatriculado(matriculaExiste)
+    } catch (error) {
+      console.error('Erro ao verificar matrícula:', error)
+    } finally {
+      setVerificandoMatricula(false)
+    }
+  }
 
   function carregarAvaliacoes() {
     if (!id) return
@@ -26,9 +57,16 @@ export default function CourseDetails(){
     if (!token) { alert('Faça login antes de matricular') ; return }
     const usuarioId = localStorage.getItem('userId')
     if (!usuarioId) { alert('Usuário não encontrado. Faça login novamente.'); return }
+    
+    if (jaMatriculado) {
+      alert('Você já está matriculado neste curso!')
+      return
+    }
+    
     try{
       await enroll({ alunoId: usuarioId, cursoId: Number(id) })
-      alert('Matriculado com sucesso')
+      alert('Matriculado com sucesso!')
+      setJaMatriculado(true)
     }catch(e:any){
       alert(e?.response?.data?.erro || 'Erro ao matricular')
     }
@@ -72,7 +110,17 @@ export default function CourseDetails(){
           <p className="text-gray-700 mb-6">{curso.descricao}</p>
 
           <div className="border-t pt-4">
-            <button onClick={handleEnroll} className="bg-primary text-white px-4 py-2 rounded hover:opacity-90">Matricular</button>
+            {verificandoMatricula ? (
+              <div className="text-gray-500">Verificando matrícula...</div>
+            ) : jaMatriculado ? (
+              <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+                ✅ Você já está matriculado neste curso!
+              </div>
+            ) : (
+              <button onClick={handleEnroll} className="bg-primary text-white px-4 py-2 rounded hover:opacity-90">
+                Matricular-se
+              </button>
+            )}
           </div>
         </div>
       </div>
