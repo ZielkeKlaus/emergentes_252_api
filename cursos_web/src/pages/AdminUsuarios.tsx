@@ -5,7 +5,7 @@ interface Usuario {
   id: number
   nome: string
   email: string
-  cidade: string
+  tipo?: string
   createdAt: string
   _count?: {
     matriculas: number
@@ -24,9 +24,9 @@ export default function AdminUsuarios() {
   async function carregarUsuarios() {
     try {
       setLoading(true)
-      const adminToken = localStorage.getItem('adminToken')
+      const token = localStorage.getItem('token')
       const response = await api.get('/usuarios', {
-        headers: { Authorization: `Bearer ${adminToken}` }
+        headers: { Authorization: `Bearer ${token}` }
       })
       setUsuarios(response.data)
     } catch (error: any) {
@@ -54,7 +54,7 @@ export default function AdminUsuarios() {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cidade</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Matrículas</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avaliações</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cadastro</th>
@@ -66,7 +66,13 @@ export default function AdminUsuarios() {
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{usuario.id}</td>
                 <td className="px-6 py-4 text-sm text-gray-900">{usuario.nome}</td>
                 <td className="px-6 py-4 text-sm text-gray-900">{usuario.email}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{usuario.cidade}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    usuario.tipo === 'instrutor' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'
+                  }`}>
+                    {usuario.tipo || 'aluno'}
+                  </span>
+                </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center">
                   {usuario._count?.matriculas || 0}
                 </td>
