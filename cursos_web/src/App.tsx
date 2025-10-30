@@ -11,8 +11,9 @@ export default function App() {
       <header className="site-header">
         <div className="container flex items-center justify-between h-16">
           <Link to="/" className="text-white font-bold text-xl">EstudeFácil</Link>
-          <nav>
-            <Link to="/login" className="text-white hover:underline">Login / Cadastrar</Link>
+          <nav className="space-x-4">
+            <Link to="/login" className="text-white hover:underline">Login</Link>
+            <Link to="/register" className="text-white hover:underline">Cadastrar</Link>
           </nav>
         </div>
       </header>
