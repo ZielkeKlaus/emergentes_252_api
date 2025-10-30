@@ -41,20 +41,30 @@ router.get("/", async (req, res) => {
 })
 
 router.post("/", async (req, res) => {
+  console.log('POST /usuarios - Body recebido:', req.body)
+  
   const valida = usuarioSchema.safeParse(req.body)
-  if (!valida.success) return res.status(400).json({ erro: valida.error })
+  if (!valida.success) {
+    console.log('Erro de validação:', valida.error)
+    return res.status(400).json({ erro: valida.error.issues })
+  }
 
   const erros = validaSenha(valida.data.senha)
-  if (erros.length > 0) return res.status(400).json({ erro: erros.join('; ') })
+  if (erros.length > 0) {
+    console.log('Erro na senha:', erros)
+    return res.status(400).json({ erro: erros.join('; ') })
+  }
 
   const salt = bcrypt.genSaltSync(12)
   const hash = bcrypt.hashSync(valida.data.senha, salt)
 
   try {
     const usuario = await prisma.usuario.create({ data: { nome: valida.data.nome, email: valida.data.email, senha: hash, tipo: valida.data.tipo || 'aluno', cidade: valida.data.cidade || null } })
+    console.log('Usuário criado com sucesso:', usuario.id)
     res.status(201).json(usuario)
   } catch (error) {
-    res.status(400).json(error)
+    console.error('Erro ao criar usuário no banco:', error)
+    res.status(400).json({ erro: 'Erro ao criar usuário' })
   }
 })
 
