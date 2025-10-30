@@ -62,8 +62,12 @@ router.post("/", async (req, res) => {
     const usuario = await prisma.usuario.create({ data: { nome: valida.data.nome, email: valida.data.email, senha: hash, tipo: valida.data.tipo || 'aluno', cidade: valida.data.cidade || null } })
     console.log('Usuário criado com sucesso:', usuario.id)
     res.status(201).json(usuario)
-  } catch (error) {
+  } catch (error: any) {
     console.error('Erro ao criar usuário no banco:', error)
+    // Verifica se é erro de email duplicado
+    if (error.code === 'P2002' && error.meta?.target?.includes('email')) {
+      return res.status(400).json({ erro: 'Este e-mail já está em uso' })
+    }
     res.status(400).json({ erro: 'Erro ao criar usuário' })
   }
 })
