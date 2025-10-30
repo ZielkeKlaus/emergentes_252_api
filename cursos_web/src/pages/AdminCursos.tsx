@@ -135,25 +135,33 @@ export default function AdminCursos() {
       cargaHoraria: parseInt(formData.cargaHoraria),
       preco: parseFloat(formData.preco),
       categoriaId: parseInt(formData.categoriaId),
-      instrutorId: parseInt(formData.instrutorId)
+      instrutorId: formData.instrutorId // UUID como string, não parseInt
     }
+
+    console.log('Payload para enviar:', payload)
 
     try {
       if (editingId) {
-        await api.put(`/cursos/${editingId}`, payload, {
+        console.log('Editando curso:', editingId)
+        const response = await api.put(`/cursos/${editingId}`, payload, {
           headers: { Authorization: `Bearer ${token}` }
         })
+        console.log('Resposta:', response.data)
         alert('Curso atualizado com sucesso!')
       } else {
-        await api.post('/cursos', payload, {
+        console.log('Criando novo curso')
+        const response = await api.post('/cursos', payload, {
           headers: { Authorization: `Bearer ${token}` }
         })
+        console.log('Resposta:', response.data)
         alert('Curso criado com sucesso!')
       }
       
       fecharModal()
       carregarDados()
     } catch (error: any) {
+      console.error('Erro ao salvar curso:', error)
+      console.error('Resposta do erro:', error.response?.data)
       alert('Erro ao salvar curso: ' + (error.response?.data?.erro || error.message))
     }
   }
