@@ -102,7 +102,7 @@ export default function AdminCursos() {
         titulo: curso.titulo,
         descricao: curso.descricao,
         cargaHoraria: curso.cargaHoraria.toString(),
-        preco: curso.preco.toString(),
+        preco: curso.preco ? curso.preco.toString() : '0',
         categoriaId: curso.categoria.id.toString(),
         instrutorId: curso.instrutor.id.toString()
       })
