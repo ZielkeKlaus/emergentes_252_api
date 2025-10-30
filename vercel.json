@@ -1,11 +1,13 @@
 {
-  "buildCommand": "cd cursos_web && npm install && npm run build",
+  "version": 2,
+  "buildCommand": "cd cursos_web && npm ci && npm run build",
   "outputDirectory": "cursos_web/dist",
-  "framework": "vite",
-  "rewrites": [
+  "installCommand": "npm install --prefix ./cursos_web",
+  "framework": null,
+  "routes": [
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
   ]
 }
