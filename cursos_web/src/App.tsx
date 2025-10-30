@@ -4,6 +4,14 @@ import Courses from './pages/Courses'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import CourseDetails from './pages/CourseDetails'
+import AdminLogin from './pages/AdminLogin'
+import AdminLayout from './layouts/AdminLayout'
+import AdminDashboard from './pages/AdminDashboard'
+import AdminCursos from './pages/AdminCursos'
+import AdminCategorias from './pages/AdminCategorias'
+import AdminUsuarios from './pages/AdminUsuarios'
+import AdminMatriculas from './pages/AdminMatriculas'
+import AdminAvaliacoes from './pages/AdminAvaliacoes'
 import { setToken } from './api'
 
 function Header() {
@@ -48,20 +56,36 @@ function Header() {
 export default function App() {
   return (
     <BrowserRouter>
-      <Header />
-
-      <main className="container py-12">
-        <Routes>
-          <Route path="/" element={<Courses />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/cursos/:id" element={<CourseDetails />} />
-        </Routes>
-      </main>
-
-      <footer className="bg-gray-100 mt-12 py-6">
-        <div className="container text-center text-sm text-gray-600">© 2025 EstudeFácil - Todos os direitos reservados.</div>
-      </footer>
+      <Routes>
+        {/* Rotas do Admin */}
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/*" element={<AdminLayout />}>
+          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="cursos" element={<AdminCursos />} />
+          <Route path="categorias" element={<AdminCategorias />} />
+          <Route path="usuarios" element={<AdminUsuarios />} />
+          <Route path="matriculas" element={<AdminMatriculas />} />
+          <Route path="avaliacoes" element={<AdminAvaliacoes />} />
+        </Route>
+        
+        {/* Rotas Públicas */}
+        <Route path="*" element={
+          <>
+            <Header />
+            <main className="container py-12">
+              <Routes>
+                <Route path="/" element={<Courses />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/cursos/:id" element={<CourseDetails />} />
+              </Routes>
+            </main>
+            <footer className="bg-gray-100 mt-12 py-6">
+              <div className="container text-center text-sm text-gray-600">© 2025 EstudeFácil - Todos os direitos reservados.</div>
+            </footer>
+          </>
+        } />
+      </Routes>
     </BrowserRouter>
   )
 }
