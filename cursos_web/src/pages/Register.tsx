@@ -14,6 +14,10 @@ export default function Register() {
     e.preventDefault()
     setError('')
     setLoading(true)
+    
+    console.log('=== INICIANDO CADASTRO ===')
+    console.log('Dados do formulário:', { nome, email, senha: '***' })
+    
     try {
       // Validações básicas
       if (nome.length < 3) {
@@ -26,16 +30,29 @@ export default function Register() {
         throw new Error('Senha deve ter no mínimo 8 caracteres')
       }
       
-      await registerUser({ nome, email, senha })
+      console.log('Validações OK. Enviando para API...')
+      console.log('API Base:', import.meta.env.VITE_API_BASE || 'http://localhost:3001')
+      
+      const resultado = await registerUser({ nome, email, senha })
+      console.log('Cadastro realizado com sucesso:', resultado)
+      
       // auto login
+      console.log('Fazendo login automático...')
       const r = await loginUser({ email, senha })
+      console.log('Login realizado:', r)
+      
       setToken(r.token)
       nav('/')
     } catch (err: any) {
-      console.error('Erro no cadastro:', err)
+      console.error('=== ERRO NO CADASTRO ===')
+      console.error('Erro completo:', err)
+      console.error('Resposta do servidor:', err?.response?.data)
+      console.error('Status HTTP:', err?.response?.status)
+      
       setError(
         err.message || // Nossas validações
         err?.response?.data?.erro || // Erro do backend
+        JSON.stringify(err?.response?.data) || // Mostra o erro completo se for um objeto
         'Erro ao criar conta. Verifique os dados e tente novamente.'
       )
     } finally {
