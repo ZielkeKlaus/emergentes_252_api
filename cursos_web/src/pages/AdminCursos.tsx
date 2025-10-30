@@ -56,18 +56,37 @@ export default function AdminCursos() {
       setLoading(true)
       const token = localStorage.getItem('token')
       
-      const [cursosRes, categoriasRes, usuariosRes] = await Promise.all([
+      console.log('Carregando dados...')
+      
+      // Carregar cursos e categorias (públicos)
+      const [cursosRes, categoriasRes] = await Promise.all([
         api.get('/cursos'),
-        api.get('/categorias'),
-        api.get('/usuarios', { headers: { Authorization: `Bearer ${token}` } })
+        api.get('/categorias')
       ])
-
+      
+      console.log('Cursos:', cursosRes.data)
+      console.log('Categorias:', categoriasRes.data)
+      
       setCursos(cursosRes.data)
       setCategorias(categoriasRes.data)
       
-      // Filtrar apenas instrutores
-      const instrutoresFiltrados = usuariosRes.data.filter((u: any) => u.tipo === 'instrutor')
-      setInstrutores(instrutoresFiltrados)
+      // Carregar usuários (precisa autenticação)
+      try {
+        const usuariosRes = await api.get('/usuarios', { 
+          headers: { Authorization: `Bearer ${token}` } 
+        })
+        console.log('Usuários:', usuariosRes.data)
+        
+        // Filtrar apenas instrutores
+        const instrutoresFiltrados = usuariosRes.data.filter((u: any) => u.tipo === 'instrutor')
+        console.log('Instrutores filtrados:', instrutoresFiltrados)
+        setInstrutores(instrutoresFiltrados)
+      } catch (userError: any) {
+        console.error('Erro ao carregar usuários:', userError)
+        // Se falhar, deixa lista vazia mas não quebra a página
+        setInstrutores([])
+      }
+      
     } catch (error: any) {
       console.error('Erro ao carregar dados:', error)
       alert('Erro ao carregar dados: ' + (error.response?.data?.erro || error.message))
