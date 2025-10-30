@@ -19,6 +19,35 @@ router.post("/", async (req, res) => {
   }
 
   try {
+    // Primeiro tenta logar como admin
+    console.log('Verificando se é admin:', email)
+    const admin = await prisma.admin.findFirst({ where: { email } })
+    
+    if (admin) {
+      console.log('Admin encontrado, comparando senhas...')
+      if (bcrypt.compareSync(senha, admin.senha)) {
+        console.log('Senha correta! Gerando token para admin...')
+        const token = jwt.sign({
+          adminLogadoId: admin.id,
+          adminLogadoNome: admin.nome,
+          tipo: 'admin'
+        }, process.env.JWT_KEY as string, { expiresIn: "1h" })
+        
+        console.log('Login de admin bem-sucedido:', email)
+        return res.status(200).json({
+          id: admin.id,
+          nome: admin.nome,
+          email: admin.email,
+          token,
+          tipo: 'admin'
+        })
+      } else {
+        console.log('Erro: Senha incorreta para admin')
+        return res.status(400).json({ erro: mensaPadrao })
+      }
+    }
+
+    // Se não for admin, tenta logar como usuário
     console.log('Buscando usuário:', email)
     const usuario = await prisma.usuario.findFirst({ where: { email } })
     
@@ -30,9 +59,20 @@ router.post("/", async (req, res) => {
     console.log('Usuário encontrado, comparando senhas...')
     if (bcrypt.compareSync(senha, usuario.senha)) {
       console.log('Senha correta! Gerando token...')
-      const token = jwt.sign({ userLogadoId: usuario.id, userLogadoNome: usuario.nome }, process.env.JWT_KEY as string, { expiresIn: "1h" })
+      const token = jwt.sign({
+        userLogadoId: usuario.id,
+        userLogadoNome: usuario.nome,
+        tipo: 'usuario'
+      }, process.env.JWT_KEY as string, { expiresIn: "1h" })
+      
       console.log('Login bem-sucedido para:', email)
-      res.status(200).json({ id: usuario.id, nome: usuario.nome, email: usuario.email, token })
+      res.status(200).json({
+        id: usuario.id,
+        nome: usuario.nome,
+        email: usuario.email,
+        token,
+        tipo: 'usuario'
+      })
     } else {
       console.log('Erro: Senha incorreta')
       res.status(400).json({ erro: mensaPadrao })
