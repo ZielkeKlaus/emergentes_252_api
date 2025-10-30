@@ -38,4 +38,14 @@ router.get("/", async (req, res) => {
   }
 })
 
+router.delete("/:id", async (req, res) => {
+  const { id } = req.params
+  try {
+    await prisma.avaliacao.delete({ where: { id: Number(id) } })
+    res.status(200).json({ mensagem: "Avaliação excluída com sucesso" })
+  } catch (error) {
+    res.status(400).json(error)
+  }
+})
+
 export default router
