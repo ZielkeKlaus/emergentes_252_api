@@ -28,9 +28,9 @@ export default function AdminAvaliacoes() {
   async function carregarAvaliacoes() {
     try {
       setLoading(true)
-      const adminToken = localStorage.getItem('adminToken')
+      const token = localStorage.getItem('token')
       const response = await api.get('/avaliacoes', {
-        headers: { Authorization: `Bearer ${adminToken}` }
+        headers: { Authorization: `Bearer ${token}` }
       })
       setAvaliacoes(response.data)
     } catch (error: any) {
@@ -43,10 +43,10 @@ export default function AdminAvaliacoes() {
   async function handleDelete(id: number) {
     if (!confirm('Tem certeza que deseja excluir esta avaliação?')) return
 
-    const adminToken = localStorage.getItem('adminToken')
+    const token = localStorage.getItem('token')
     try {
       await api.delete(`/avaliacoes/${id}`, {
-        headers: { Authorization: `Bearer ${adminToken}` }
+        headers: { Authorization: `Bearer ${token}` }
       })
       alert('Avaliação excluída com sucesso!')
       carregarAvaliacoes()

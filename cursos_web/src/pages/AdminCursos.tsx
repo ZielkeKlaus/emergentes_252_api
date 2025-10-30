@@ -54,18 +54,22 @@ export default function AdminCursos() {
   async function carregarDados() {
     try {
       setLoading(true)
-      const adminToken = localStorage.getItem('adminToken')
+      const token = localStorage.getItem('token')
       
-      const [cursosRes, categoriasRes, instrutoresRes] = await Promise.all([
-        api.get('/cursos', { headers: { Authorization: `Bearer ${adminToken}` } }),
-        api.get('/categorias', { headers: { Authorization: `Bearer ${adminToken}` } }),
-        api.get('/usuarios', { headers: { Authorization: `Bearer ${adminToken}` } })
+      const [cursosRes, categoriasRes, usuariosRes] = await Promise.all([
+        api.get('/cursos'),
+        api.get('/categorias'),
+        api.get('/usuarios', { headers: { Authorization: `Bearer ${token}` } })
       ])
 
       setCursos(cursosRes.data)
       setCategorias(categoriasRes.data)
-      setInstrutores(instrutoresRes.data)
+      
+      // Filtrar apenas instrutores
+      const instrutoresFiltrados = usuariosRes.data.filter((u: any) => u.tipo === 'instrutor')
+      setInstrutores(instrutoresFiltrados)
     } catch (error: any) {
+      console.error('Erro ao carregar dados:', error)
       alert('Erro ao carregar dados: ' + (error.response?.data?.erro || error.message))
     } finally {
       setLoading(false)
@@ -105,7 +109,7 @@ export default function AdminCursos() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     
-    const adminToken = localStorage.getItem('adminToken')
+    const token = localStorage.getItem('token')
     const payload = {
       titulo: formData.titulo,
       descricao: formData.descricao,
@@ -118,12 +122,12 @@ export default function AdminCursos() {
     try {
       if (editingId) {
         await api.put(`/cursos/${editingId}`, payload, {
-          headers: { Authorization: `Bearer ${adminToken}` }
+          headers: { Authorization: `Bearer ${token}` }
         })
         alert('Curso atualizado com sucesso!')
       } else {
         await api.post('/cursos', payload, {
-          headers: { Authorization: `Bearer ${adminToken}` }
+          headers: { Authorization: `Bearer ${token}` }
         })
         alert('Curso criado com sucesso!')
       }
@@ -138,10 +142,10 @@ export default function AdminCursos() {
   async function handleDelete(id: number) {
     if (!confirm('Tem certeza que deseja excluir este curso?')) return
 
-    const adminToken = localStorage.getItem('adminToken')
+    const token = localStorage.getItem('token')
     try {
       await api.delete(`/cursos/${id}`, {
-        headers: { Authorization: `Bearer ${adminToken}` }
+        headers: { Authorization: `Bearer ${token}` }
       })
       alert('Curso excluído com sucesso!')
       carregarDados()
