@@ -57,9 +57,9 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Rotas do Admin */}
+        {/* Rotas do Admin - DEVEM VIR PRIMEIRO */}
         <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/*" element={<AdminLayout />}>
+        <Route path="/admin" element={<AdminLayout />}>
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="cursos" element={<AdminCursos />} />
           <Route path="categorias" element={<AdminCategorias />} />
@@ -69,16 +69,47 @@ export default function App() {
         </Route>
         
         {/* Rotas Públicas */}
-        <Route path="*" element={
+        <Route path="/" element={
           <>
             <Header />
             <main className="container py-12">
-              <Routes>
-                <Route path="/" element={<Courses />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/cursos/:id" element={<CourseDetails />} />
-              </Routes>
+              <Courses />
+            </main>
+            <footer className="bg-gray-100 mt-12 py-6">
+              <div className="container text-center text-sm text-gray-600">© 2025 EstudeFácil - Todos os direitos reservados.</div>
+            </footer>
+          </>
+        } />
+        
+        <Route path="/login" element={
+          <>
+            <Header />
+            <main className="container py-12">
+              <Login />
+            </main>
+            <footer className="bg-gray-100 mt-12 py-6">
+              <div className="container text-center text-sm text-gray-600">© 2025 EstudeFácil - Todos os direitos reservados.</div>
+            </footer>
+          </>
+        } />
+        
+        <Route path="/register" element={
+          <>
+            <Header />
+            <main className="container py-12">
+              <Register />
+            </main>
+            <footer className="bg-gray-100 mt-12 py-6">
+              <div className="container text-center text-sm text-gray-600">© 2025 EstudeFácil - Todos os direitos reservados.</div>
+            </footer>
+          </>
+        } />
+        
+        <Route path="/cursos/:id" element={
+          <>
+            <Header />
+            <main className="container py-12">
+              <CourseDetails />
             </main>
             <footer className="bg-gray-100 mt-12 py-6">
               <div className="container text-center text-sm text-gray-600">© 2025 EstudeFácil - Todos os direitos reservados.</div>
