@@ -24,7 +24,7 @@ export default function AdminLogin() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-8">
-        <h2 className="text-center text-3xl font-bold text-brand mb-6">Admin - EstudeFácil</h2>
+        <h2 className="text-center text-3xl font-bold text-brand mb-6">Admin - Cursos Academy</h2>
         <form onSubmit={submit}>
           <div className="mb-4">
             <label className="block text-sm mb-1 font-semibold">Email</label>

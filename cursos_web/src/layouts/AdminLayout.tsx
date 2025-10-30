@@ -27,7 +27,7 @@ export default function AdminLayout() {
       {/* Sidebar */}
       <aside className="w-64 bg-brand text-white flex flex-col">
         <div className="p-6 border-b border-gray-700">
-          <h1 className="text-2xl font-bold">EstudeFácil</h1>
+          <h1 className="text-2xl font-bold">Cursos Academy</h1>
           <p className="text-sm text-gray-300">Admin Panel</p>
         </div>
         

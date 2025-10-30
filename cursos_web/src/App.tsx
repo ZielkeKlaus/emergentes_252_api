@@ -34,7 +34,7 @@ function Header() {
   return (
     <header className="site-header">
       <div className="container flex items-center justify-between h-16">
-        <Link to="/" className="text-white font-bold text-xl">EstudeFácil</Link>
+        <Link to="/" className="text-white font-bold text-xl">Cursos Academy</Link>
         <nav className="flex items-center gap-4">
           {userNome ? (
             <>
@@ -76,7 +76,7 @@ export default function App() {
               <Courses />
             </main>
             <footer className="bg-gray-100 mt-12 py-6">
-              <div className="container text-center text-sm text-gray-600">© 2025 EstudeFácil - Todos os direitos reservados.</div>
+              <div className="container text-center text-sm text-gray-600">© 2025 Cursos Academy - Todos os direitos reservados.</div>
             </footer>
           </>
         } />
@@ -88,7 +88,7 @@ export default function App() {
               <Login />
             </main>
             <footer className="bg-gray-100 mt-12 py-6">
-              <div className="container text-center text-sm text-gray-600">© 2025 EstudeFácil - Todos os direitos reservados.</div>
+              <div className="container text-center text-sm text-gray-600">© 2025 Cursos Academy - Todos os direitos reservados.</div>
             </footer>
           </>
         } />
@@ -100,7 +100,7 @@ export default function App() {
               <Register />
             </main>
             <footer className="bg-gray-100 mt-12 py-6">
-              <div className="container text-center text-sm text-gray-600">© 2025 EstudeFácil - Todos os direitos reservados.</div>
+              <div className="container text-center text-sm text-gray-600">© 2025 Cursos Academy - Todos os direitos reservados.</div>
             </footer>
           </>
         } />
@@ -112,7 +112,7 @@ export default function App() {
               <CourseDetails />
             </main>
             <footer className="bg-gray-100 mt-12 py-6">
-              <div className="container text-center text-sm text-gray-600">© 2025 EstudeFácil - Todos os direitos reservados.</div>
+              <div className="container text-center text-sm text-gray-600">© 2025 Cursos Academy - Todos os direitos reservados.</div>
             </footer>
           </>
         } />
