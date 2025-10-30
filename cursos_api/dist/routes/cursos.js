@@ -19,7 +19,8 @@ router.get("/", async (req, res) => {
         res.status(200).json(cursos);
     }
     catch (error) {
-        res.status(500).json({ erro: error });
+        console.error('GET /cursos erro:', error);
+        res.status(500).json({ erro: 'Erro interno no servidor' });
     }
 });
 router.get("/:id", async (req, res) => {
@@ -29,7 +30,8 @@ router.get("/:id", async (req, res) => {
         res.status(200).json(curso);
     }
     catch (error) {
-        res.status(500).json({ erro: error });
+        console.error(`GET /cursos/${id} erro:`, error);
+        res.status(500).json({ erro: 'Erro interno no servidor' });
     }
 });
 router.post("/", async (req, res) => {
@@ -41,7 +43,8 @@ router.post("/", async (req, res) => {
         res.status(201).json(curso);
     }
     catch (error) {
-        res.status(400).json({ erro: error });
+        console.error('POST /cursos erro:', error);
+        res.status(400).json({ erro: 'Erro ao criar curso' });
     }
 });
 router.put("/:id", async (req, res) => {
@@ -54,7 +57,8 @@ router.put("/:id", async (req, res) => {
         res.status(200).json(curso);
     }
     catch (error) {
-        res.status(400).json({ erro: error });
+        console.error(`PUT /cursos/${id} erro:`, error);
+        res.status(400).json({ erro: 'Erro ao atualizar curso' });
     }
 });
 router.delete("/:id", async (req, res) => {
@@ -64,7 +68,8 @@ router.delete("/:id", async (req, res) => {
         res.status(200).json(curso);
     }
     catch (error) {
-        res.status(400).json({ erro: error });
+        console.error(`DELETE /cursos/${id} erro:`, error);
+        res.status(400).json({ erro: 'Erro ao deletar curso' });
     }
 });
 exports.default = router;

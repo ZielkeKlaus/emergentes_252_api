@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 require("dotenv/config");
+const client_1 = require("@prisma/client");
 const categorias_1 = __importDefault(require("./routes/categorias"));
 const cursos_1 = __importDefault(require("./routes/cursos"));
 const usuarios_1 = __importDefault(require("./routes/usuarios"));
@@ -17,6 +18,11 @@ const adminLogin_1 = __importDefault(require("./routes/adminLogin"));
 const dashboard_1 = __importDefault(require("./routes/dashboard"));
 const app = (0, express_1.default)();
 const port = process.env.PORT || 3001;
+const prisma = new client_1.PrismaClient();
+// Startup checks (do not print secrets)
+if (!process.env.DATABASE_URL) {
+    console.warn('Aviso: DATABASE_URL não definida no ambiente. O acesso ao banco provavelmente falhará.');
+}
 app.use(express_1.default.json());
 app.use((0, cors_1.default)());
 app.use('/categorias', categorias_1.default);
@@ -29,4 +35,17 @@ app.use('/admins/login', adminLogin_1.default);
 app.use('/admins', admins_1.default);
 app.use('/dashboard', dashboard_1.default);
 app.get('/', (req, res) => res.send('API: Cursos Academy'));
+// Health endpoint to check DB connectivity
+app.get('/health/db', async (req, res) => {
+    try {
+        // simple query to verify DB connectivity
+        // use raw query to avoid depending on model state
+        await prisma.$queryRaw `SELECT 1`;
+        res.status(200).json({ ok: true });
+    }
+    catch (err) {
+        console.error('Health DB check failed:', err);
+        res.status(500).json({ ok: false, error: 'DB connection failed' });
+    }
+});
 app.listen(port, () => console.log(`Servidor Cursos API rodando na porta ${port}`));
