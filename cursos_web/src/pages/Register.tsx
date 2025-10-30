@@ -42,6 +42,7 @@ export default function Register() {
       console.log('Login realizado:', r)
       
       setToken(r.token)
+      localStorage.setItem('userNome', r.nome)
       nav('/')
     } catch (err: any) {
       console.error('=== ERRO NO CADASTRO ===')

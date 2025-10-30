@@ -17,6 +17,7 @@ export default function Login() {
       console.log('Login bem-sucedido:', res)
       // res should include token
       setToken(res.token)
+      localStorage.setItem('userNome', res.nome)
       nav('/')
     } catch (err: any) {
       console.error('Erro no login:', err)
