@@ -4,7 +4,9 @@
   "main": "index.ts",
   "scripts": {
     "dev": "npx ts-node-dev --respawn index.ts",
-    "vercel-build": "npx prisma migrate deploy",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "vercel-build": "npm run build && npx prisma migrate deploy",
     "postinstall": "prisma generate",
     "seed": "npx ts-node scripts/seed_and_test_prisma.ts",
     "test:flow": "npx ts-node scripts/test_flow.ts"
