@@ -1,0 +1,92 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgres"
+  url      = env("DATABASE_URL")
+}
+
+model Categoria {
+  id        Int     @id @default(autoincrement())
+  nome      String  @db.VarChar(50)
+  cursos    Curso[]
+  @@map("categorias")
+}
+
+model Usuario {
+  id         String    @db.VarChar(36) @id @default(uuid())
+  nome       String    @db.VarChar(60)
+  email      String    @db.VarChar(80) @unique
+  senha      String    @db.VarChar(60)
+  tipo       String    @db.VarChar(20)
+  cidade     String?   @db.VarChar(60)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  matriculas Matricula[]
+  avaliacoes Avaliacao[]
+  cursosInstrutor Curso[]
+  @@map("usuarios")
+}
+
+model Curso {
+  id            Int       @id @default(autoincrement())
+  titulo        String    @db.VarChar(100)
+  descricao     String    @db.VarChar(1000)
+  cargaHoraria  Int
+  categoria     Categoria @relation(fields: [categoriaId], references: [id])
+  categoriaId   Int
+  instrutor     Usuario   @relation(fields: [instrutorId], references: [id])
+  instrutorId   String    @db.VarChar(36)
+  imagem        String?   @db.VarChar(255)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  matriculas    Matricula[]
+  avaliacoes    Avaliacao[]
+  @@map("cursos")
+}
+
+model Matricula {
+  id         Int      @id @default(autoincrement())
+  aluno      Usuario  @relation(fields: [alunoId], references: [id])
+  alunoId    String   @db.VarChar(36)
+  curso      Curso    @relation(fields: [cursoId], references: [id])
+  cursoId    Int
+  data       DateTime @default(now())
+  @@map("matriculas")
+}
+
+model Avaliacao {
+  id         Int      @id @default(autoincrement())
+  aluno      Usuario  @relation(fields: [alunoId], references: [id])
+  alunoId    String   @db.VarChar(36)
+  curso      Curso    @relation(fields: [cursoId], references: [id])
+  cursoId    Int
+  nota       Int
+  comentario String?  @db.VarChar(400)
+  createdAt  DateTime @default(now())
+  @@map("avaliacoes")
+}
+
+model Admin {
+  id        String   @db.VarChar(36) @id @default(uuid())
+  nome      String   @db.VarChar(60)
+  email     String   @db.VarChar(80) @unique
+  senha     String   @db.VarChar(60)
+  nivel     Int      @db.SmallInt @default(2)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  logs      Log[]
+  @@map("admins")
+}
+
+model Log {
+  id          Int      @id @default(autoincrement())
+  admin       Admin    @relation(fields: [adminId], references: [id])
+  adminId     String   @db.VarChar(36)
+  descricao   String   @db.VarChar(100)
+  complemento String?  @db.VarChar(200)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@map("logs")
+}
