@@ -278,4 +278,47 @@ router.post("/update-precos", async (req, res) => {
   }
 })
 
+// Rota para adicionar coluna preco (se não existir)
+router.post("/add-preco-column", async (req, res) => {
+  try {
+    // Executar SQL raw para adicionar a coluna
+    await prisma.$executeRaw`ALTER TABLE cursos ADD COLUMN IF NOT EXISTS preco DOUBLE PRECISION`
+    
+    res.status(200).json({
+      mensagem: "Coluna 'preco' adicionada com sucesso (ou já existia)!"
+    })
+  } catch (error: any) {
+    console.error("Erro ao adicionar coluna preco:", error)
+    res.status(400).json({ erro: error.message })
+  }
+})
+
+// Rota para atualizar preços dos cursos existentes
+router.post("/update-precos", async (req, res) => {
+  try {
+    // Definir preços padrão para cursos que não têm preço
+    const cursosAtualizados = await prisma.$executeRaw`
+      UPDATE cursos 
+      SET preco = CASE 
+        WHEN id = 1 THEN 299.90
+        WHEN id = 2 THEN 349.90
+        WHEN id = 3 THEN 199.90
+        WHEN id = 4 THEN 149.90
+        WHEN id = 5 THEN 399.90
+        WHEN id = 6 THEN 449.90
+        ELSE 199.90
+      END
+      WHERE preco IS NULL
+    `
+    
+    res.status(200).json({
+      mensagem: "Preços atualizados com sucesso!",
+      cursosAtualizados
+    })
+  } catch (error: any) {
+    console.error("Erro ao atualizar preços:", error)
+    res.status(400).json({ erro: error.message })
+  }
+})
+
 export default router
