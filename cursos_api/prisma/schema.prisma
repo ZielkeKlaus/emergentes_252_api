@@ -34,6 +34,7 @@ model Curso {
   titulo        String    @db.VarChar(100)
   descricao     String    @db.VarChar(1000)
   cargaHoraria  Int
+  preco         Float?
   categoria     Categoria @relation(fields: [categoriaId], references: [id])
   categoriaId   Int
   instrutor     Usuario   @relation(fields: [instrutorId], references: [id])
