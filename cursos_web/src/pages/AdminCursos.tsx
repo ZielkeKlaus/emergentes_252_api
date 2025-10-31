@@ -162,7 +162,13 @@ export default function AdminCursos() {
     } catch (error: any) {
       console.error('Erro ao salvar curso:', error)
       console.error('Resposta do erro:', error.response?.data)
-      alert('Erro ao salvar curso: ' + (error.response?.data?.erro || error.message))
+      
+      const detalhes = error.response?.data?.detalhes
+      if (detalhes && Array.isArray(detalhes)) {
+        alert('Erro de validação:\n' + detalhes.join('\n'))
+      } else {
+        alert('Erro ao salvar curso: ' + (error.response?.data?.erro || error.message))
+      }
     }
   }
 

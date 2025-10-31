@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { api } from '../api'
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts'
 
 interface Stats {
   usuarios: number
@@ -13,17 +13,11 @@ interface CursosPorCategoria {
   total: number
 }
 
-interface UsuariosPorCidade {
-  cidade: string
-  total: number
-}
-
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D', '#FFC658', '#FF6B6B']
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState<Stats | null>(null)
   const [cursosPorCategoria, setCursosPorCategoria] = useState<CursosPorCategoria[]>([])
-  const [usuariosPorCidade, setUsuariosPorCidade] = useState<UsuariosPorCidade[]>([])
   const adminNome = localStorage.getItem('adminNome')
 
   useEffect(() => {
@@ -32,18 +26,16 @@ export default function AdminDashboard() {
 
   async function carregarDados() {
     try {
-      const adminToken = localStorage.getItem('adminToken')
-      const headers = { Authorization: `Bearer ${adminToken}` }
+      const token = localStorage.getItem('token')
+      const headers = { Authorization: `Bearer ${token}` }
       
-      const [statsRes, cursosRes, usuariosRes] = await Promise.all([
+      const [statsRes, cursosRes] = await Promise.all([
         api.get('/dashboard/gerais', { headers }),
-        api.get('/dashboard/cursosPorCategoria', { headers }),
-        api.get('/dashboard/usuariosPorCidade', { headers })
+        api.get('/dashboard/cursosPorCategoria', { headers })
       ])
 
       setStats(statsRes.data)
       setCursosPorCategoria(cursosRes.data)
-      setUsuariosPorCidade(usuariosRes.data)
     } catch (error: any) {
       console.error('Erro ao carregar dados:', error)
       alert('Erro ao carregar dados: ' + (error.response?.data?.erro || error.message))
@@ -93,7 +85,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Gráficos */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6">
         {/* Cursos por Categoria */}
         <div className="bg-white rounded-lg shadow p-6">
           <h2 className="text-lg font-semibold text-gray-800 mb-4">Cursos por Categoria</h2>
@@ -116,25 +108,6 @@ export default function AdminDashboard() {
                 </Pie>
                 <Tooltip />
               </PieChart>
-            </ResponsiveContainer>
-          ) : (
-            <p className="text-gray-500 text-center py-8">Nenhum dado disponível</p>
-          )}
-        </div>
-
-        {/* Usuários por Cidade */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">Usuários por Cidade</h2>
-          {usuariosPorCidade.length > 0 ? (
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={usuariosPorCidade}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="cidade" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="total" fill="#8b5cf6" name="Usuários" />
-              </BarChart>
             </ResponsiveContainer>
           ) : (
             <p className="text-gray-500 text-center py-8">Nenhum dado disponível</p>
