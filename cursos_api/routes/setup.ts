@@ -230,4 +230,52 @@ router.post("/popular-dados", async (req, res) => {
   }
 })
 
+// Rota para adicionar coluna preco (já existe no schema, só valida)
+router.post("/add-preco-column", async (req, res) => {
+  try {
+    // Executar SQL para adicionar coluna se não existir
+    await prisma.$executeRaw`ALTER TABLE cursos ADD COLUMN IF NOT EXISTS preco DOUBLE PRECISION`
+    
+    res.status(200).json({
+      mensagem: "Coluna preco adicionada com sucesso (se ainda não existia)!"
+    })
+  } catch (error) {
+    console.error("Erro ao adicionar coluna preco:", error)
+    res.status(400).json({ erro: "Erro ao adicionar coluna", detalhes: error })
+  }
+})
+
+// Rota para atualizar preços dos cursos existentes
+router.post("/update-precos", async (req, res) => {
+  try {
+    // Atualizar cursos com preços padrão
+    const cursosAtualizados = await prisma.$transaction([
+      prisma.curso.updateMany({
+        where: { categoriaId: 1 }, // Programação
+        data: { preco: 199.90 }
+      }),
+      prisma.curso.updateMany({
+        where: { categoriaId: 2 }, // Design
+        data: { preco: 149.90 }
+      }),
+      prisma.curso.updateMany({
+        where: { categoriaId: 3 }, // Marketing
+        data: { preco: 129.90 }
+      }),
+      prisma.curso.updateMany({
+        where: { categoriaId: 4 }, // Negócios
+        data: { preco: 179.90 }
+      })
+    ])
+    
+    res.status(200).json({
+      mensagem: "Preços atualizados com sucesso!",
+      cursosAtualizados: cursosAtualizados.reduce((acc, curr) => acc + curr.count, 0)
+    })
+  } catch (error) {
+    console.error("Erro ao atualizar preços:", error)
+    res.status(400).json({ erro: "Erro ao atualizar preços", detalhes: error })
+  }
+})
+
 export default router
