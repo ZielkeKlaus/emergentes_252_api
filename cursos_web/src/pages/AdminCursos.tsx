@@ -17,7 +17,8 @@ interface Curso {
   titulo: string
   descricao: string
   cargaHoraria: number
-  preco: number
+  preco: number | null
+  imagem: string | null
   categoria: Categoria
   instrutor: Instrutor
 }
@@ -29,6 +30,7 @@ interface CursoForm {
   preco: string
   categoriaId: string
   instrutorId: string
+  imagem: string
 }
 
 export default function AdminCursos() {
@@ -44,7 +46,8 @@ export default function AdminCursos() {
     cargaHoraria: '',
     preco: '',
     categoriaId: '',
-    instrutorId: ''
+    instrutorId: '',
+    imagem: ''
   })
 
   useEffect(() => {
@@ -102,9 +105,10 @@ export default function AdminCursos() {
         titulo: curso.titulo,
         descricao: curso.descricao,
         cargaHoraria: curso.cargaHoraria.toString(),
-        preco: curso.preco ? curso.preco.toString() : '0',
+        preco: curso.preco ? curso.preco.toString() : '',
         categoriaId: curso.categoria.id.toString(),
-        instrutorId: curso.instrutor.id.toString()
+        instrutorId: curso.instrutor.id.toString(),
+        imagem: curso.imagem || ''
       })
     } else {
       setEditingId(null)
@@ -114,7 +118,8 @@ export default function AdminCursos() {
         cargaHoraria: '',
         preco: '',
         categoriaId: '',
-        instrutorId: ''
+        instrutorId: '',
+        imagem: ''
       })
     }
     setShowModal(true)
@@ -129,13 +134,24 @@ export default function AdminCursos() {
     e.preventDefault()
     
     const token = localStorage.getItem('token')
-    const payload = {
+    
+    // Preparar payload com validação adequada
+    const payload: any = {
       titulo: formData.titulo,
       descricao: formData.descricao,
       cargaHoraria: parseInt(formData.cargaHoraria),
-      preco: parseFloat(formData.preco),
       categoriaId: parseInt(formData.categoriaId),
-      instrutorId: formData.instrutorId // UUID como string, não parseInt
+      instrutorId: formData.instrutorId
+    }
+    
+    // Adicionar preco apenas se for fornecido e válido
+    if (formData.preco && formData.preco.trim() !== '') {
+      payload.preco = parseFloat(formData.preco)
+    }
+    
+    // Adicionar imagem apenas se fornecida
+    if (formData.imagem && formData.imagem.trim() !== '') {
+      payload.imagem = formData.imagem
     }
 
     console.log('Payload para enviar:', payload)
@@ -295,15 +311,15 @@ export default function AdminCursos() {
               </div>
 
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Preço (R$)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Preço (R$) - Opcional</label>
                 <input
                   type="number"
                   step="0.01"
                   value={formData.preco}
                   onChange={(e) => setFormData({ ...formData, preco: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-brand"
-                  required
                   min="0"
+                  placeholder="Ex: 199.90"
                 />
               </div>
 
