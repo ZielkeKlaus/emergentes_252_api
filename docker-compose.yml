@@ -1,0 +1,112 @@
+# ==================================
+# DOCKER COMPOSE - EstudeFácil/Cursos Academy
+# ==================================
+# Ambiente completo com 3 containers:
+# 1. PostgreSQL (banco de dados)
+# 2. Backend API (Node.js + Prisma)
+# 3. Frontend (React + Nginx)
+# ==================================
+
+version: '3.8'
+
+services:
+  # ==================================
+  # 1. BANCO DE DADOS - PostgreSQL
+  # ==================================
+  database:
+    image: postgres:15-alpine
+    container_name: cursos_database
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-cursosuser}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-cursospass123}
+      POSTGRES_DB: ${DB_NAME:-cursosdb}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=pt_BR.UTF-8"
+    ports:
+      - "5432:5432"
+    volumes:
+      # Volume para persistência de dados
+      - postgres_data:/var/lib/postgresql/data
+      # Script de inicialização (opcional)
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - cursos_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-cursosuser} -d ${DB_NAME:-cursosdb}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ==================================
+  # 2. BACKEND - API Node.js
+  # ==================================
+  backend:
+    build:
+      context: ./cursos_api
+      dockerfile: Dockerfile
+    container_name: cursos_backend
+    restart: unless-stopped
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      # Configuração do banco de dados
+      DATABASE_URL: postgresql://${DB_USER:-cursosuser}:${DB_PASSWORD:-cursospass123}@database:5432/${DB_NAME:-cursosdb}?schema=public
+      # Configuração JWT
+      JWT_KEY: ${JWT_KEY:-minha_chave_secreta_jwt_12345}
+      # Configuração da aplicação
+      NODE_ENV: production
+      PORT: 3001
+      # Email (opcional)
+      MAILTRAP_EMAIL: ${MAILTRAP_EMAIL:-}
+      MAILTRAP_SENHA: ${MAILTRAP_SENHA:-}
+    ports:
+      - "3001:3001"
+    networks:
+      - cursos_network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3001/categorias"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # ==================================
+  # 3. FRONTEND - React + Nginx
+  # ==================================
+  frontend:
+    build:
+      context: ./cursos_web
+      dockerfile: Dockerfile
+      args:
+        # Variável de ambiente para build
+        VITE_API_BASE: http://localhost:3001
+    container_name: cursos_frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    networks:
+      - cursos_network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+# ==================================
+# VOLUMES - Persistência de Dados
+# ==================================
+volumes:
+  postgres_data:
+    driver: local
+    name: cursos_postgres_data
+
+# ==================================
+# NETWORKS - Rede Docker
+# ==================================
+networks:
+  cursos_network:
+    driver: bridge
+    name: cursos_network
